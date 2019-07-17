@@ -5,7 +5,7 @@
 // @author Max Max
 // @license MIT
 // @include *
-// @icon http://pics.smotri.com/cskins/blue/smiles/bt.gif
+// @icon
 // @run-at document-end
 // @grant none
 // ==/UserScript==
