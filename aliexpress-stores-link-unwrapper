@@ -1,0 +1,73 @@
+// ==UserScript==
+// @name     			AliExpress stores link unwrapper
+// @version  			1
+// @author   			Alex Xela
+// @description	  Fix mangled links on aliexpress that doesn't contains "href" attribute but contains "data-href" that handled by JS "onclick" function.
+// @include  			*.aliexpress.*
+// ==/UserScript==
+
+function fixHyperlinks() {
+  const links = document.querySelectorAll('a[data-href]:not([href])');
+
+	[].forEach.call(links, link => {
+    const href = link.getAttribute('data-href');
+    
+    // Restore "href" on link
+  	link.setAttribute('href', href);
+    
+    // Disable click handler that prevents middle-click
+  	link.onclick = null;
+	});
+}
+
+function replaceElement(source, newType) {
+	// Create the document fragment
+  const frag = document.createDocumentFragment();
+  
+  while (source.firstChild) {
+  	frag.appendChild(source.firstChild);
+  }
+
+  const newElem = document.createElement(newType);
+
+  [].forEach.call(source.attributes, attr => {
+    newElem.setAttribute(attr.name, attr.value);
+  });
+    
+  newElem.appendChild(frag);
+
+  newElem.setAttribute('data-manual', true);
+  
+  source.parentNode.replaceChild(newElem, source);
+}
+
+function fixDivs() {
+  // Fix by one because each node replacement triggers new DOMNodeInserted event and overall process repeated until
+  // there aren't DIVs without "data-manual" attribute remains
+  const div = document.querySelector('div[data-href]:not([data-manual])');
+
+  if (!div) return;
+  
+	//[].forEach.call(divs, link => {
+    const href = div.getAttribute('data-href');
+    
+    // Restore "href" on link
+  	div.setAttribute('href', href);
+    
+    // Disable click handler that prevents middle-click
+  	div.onclick = null;
+    
+    replaceElement(div, 'a');
+	//});
+}
+
+function checkDocument() {
+  fixHyperlinks();
+  fixDivs();
+}
+
+(function() {
+  document.addEventListener('DOMNodeInserted', checkDocument);
+  
+  checkDocument();
+})();
