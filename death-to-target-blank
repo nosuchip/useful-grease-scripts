@@ -1,0 +1,25 @@
+// ==UserScript==
+// @name        Death to _blank
+// @description Remove "target=_blank" from all hyperlinks
+// @version     1
+// @include     *
+// @run-at      document-end
+// @grant    none
+// ==/UserScript==
+
+const body = document.getElementsByTagName('body')[0];
+
+// Create DOM mutation observer
+const observer = new MutationObserver(function( mutations ) {  
+  const links = document.getElementsByTagName('a');
+  
+  for(let i = 0; i < links.length; i++) {
+    const link = links[i];
+  
+    if (link.getAttribute('target')) {
+      link.removeAttribute('target');
+    }
+  }
+});
+
+observer.observe(body, { attributes: true, childList: true, subtree: true });
